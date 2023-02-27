@@ -10,7 +10,7 @@ services:
       - "--nodiscover"
       - "--config=/bkc-node/config.toml"
     # environment:
-      # BOOTNODE_KEY: e3f43ab997370815133aff692bde03372c9bd7f8b87d3ce327ad0a40610458f9
+      # NODE_KEY: e3f43ab997370815133aff692bde03372c9bd7f8b87d3ce327ad0a40610458f9
       # STATS_SERVER: bkc-node-stats:80
       # STATS_PASSWORD: helloWorld
       # HOSTNAME: bkc-mainnet-bootnode

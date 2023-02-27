@@ -4,8 +4,8 @@ if [ ! -d /bkc-node/data/geth ]; then
     geth --datadir /bkc-node/data  init /bkc-node/genesis.json
 fi
 
-if [ ! -z "$BOOTNODE_KEY" ] ; then
-    echo "$BOOTNODE_KEY" > /bkc-node/data/node.key
+if [ ! -z "$NODE_KEY" ] ; then
+    echo "$NODE_KEY" > /bkc-node/data/node.key
     nodekey="--nodekey=/bkc-node/data/node.key"
 fi
 
