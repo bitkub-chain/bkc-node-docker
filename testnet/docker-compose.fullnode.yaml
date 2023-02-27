@@ -42,7 +42,7 @@ services:
     restart: always
 
   bkc-node-stats:
-    image: bitkubchainorg/bkc-stats-server:mainnet
+    image: bitkubchainorg/bkc-stats-server:testnet
     depends_on:
       - bkc-node
     environment:
