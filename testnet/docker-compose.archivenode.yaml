@@ -1,0 +1,66 @@
+version: "3"
+services:
+  bkc-node:
+    image: bitkubchainorg/node:latest
+    entrypoint: /bkc-node/run-geth.sh
+    command:
+      - "--datadir=/bkc-node/data"
+      - "--syncmode=full"
+      - "--gcmode=archive"
+      - "--config=/bkc-node/config.toml"
+    # environment:
+      # STATS_SERVER: bkc-node-stats:80
+      # STATS_PASSWORD: helloWorld
+      # HOSTNAME: bkc-testnet-archivenode
+    ports:
+      - "30303:30303/udp"
+      - "30303:30303"
+      - "8545:8545"
+      - "8546:8546"
+    volumes:
+      - "./genesis.json:/bkc-node/genesis.json"
+      - "./config.toml:/bkc-node/config.toml"
+      - "./data:/bkc-node/data"
+      - "./run-geth.sh:/bkc-node/run-geth.sh"
+    restart: always
+    healthcheck:
+      test: curl --fail http://localhost:8545 || exit 1
+      interval: 60s
+      retries: 5
+      start_period: 20s
+      timeout: 10s
+  
+  bkc-node-healthcheck:
+    image: bitkubchainorg/bkc-node-healthcheck
+    depends_on:
+      - bkc-node
+    environment:
+      PORT: 8080
+      RPC_URL: http://bkc-node:8545
+      NETWORK_URLS: https://rpc-testnet.bitkubchain.io
+    ports:
+      - "8080:8080"
+    restart: always
+    healthcheck:
+      test: curl --fail http://localhost:8080 || exit 1
+      interval: 60s
+      retries: 5
+      start_period: 20s
+      timeout: 10s
+
+  # bkc-node-stats:
+  #   image: bitkubchainorg/bkc-stats-server:mainnet
+  #   depends_on:
+  #     - bkc-node
+  #   environment:
+  #     PORT: 80
+  #     WS_SECRET: helloWorld
+  #   ports:
+  #     - "80:80"
+  #   restart: always
+  #   healthcheck:
+  #     test: curl --fail http://localhost:80 || exit 1
+  #     interval: 60s
+  #     retries: 5
+  #     start_period: 20s
+  #     timeout: 10s
