@@ -22,6 +22,8 @@ services:
       - "./data:/bkc-node/data"
       - "./run-geth.sh:/bkc-node/run-geth.sh"
     restart: always
+    stop_signal: SIGINT
+    stop_grace_period: 1m
     healthcheck:
       test: curl --fail http://localhost:8545 || exit 1
       interval: 60s
