@@ -1,9 +1,7 @@
 #!/bin/sh
 
 if [ ! -d /bkc-node/data/geth ]; then
-    echo "/bkc-node/data/geth not found, running 'geth init'..."
     geth --datadir /bkc-node/data  init /bkc-node/genesis.json
-    echo "...done!"
 fi
 
 if [ ! -z "$BOOTNODE_KEY" ] ; then
