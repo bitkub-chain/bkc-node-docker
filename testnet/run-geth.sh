@@ -13,6 +13,10 @@ if [ ! -z "$HOSTNAME" ] ; then
     identity="--identity=${HOSTNAME}"
 fi
 
+if [ ! -z "$BOOTNODES" ] ; then
+    bootnodes="--bootnodes=${BOOTNODES}"
+fi
+
 if [ ! -z "$CACHE" ] ; then
     cache="--cache=${CACHE}"
 fi
@@ -23,4 +27,4 @@ else
     ethstats="--ethstats=${HOSTNAME}:${STATS_PASSWORD}@${STATS_SERVER}"
 fi
 
-geth $identity $nodekey $cache $ethstats "$@"
+geth $identity $nodekey $cache $ethstats $bootnodes "$@"
