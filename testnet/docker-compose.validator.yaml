@@ -2,20 +2,24 @@ version: "3"
 services:
   bkc-node:
     image: bitkubchainorg/bkc-node-testnet:2.1.0
+    env_file:
+      - ./validator.env      
     command:
-      - "--syncmode=full"
-      - "--gcmode=archive"
+      - "--config=/bkc-node/config.toml"
+      - "--datadir=/bkc-node/data"
+      - "--syncmode=snap"
+      - "--v5disc"
     environment:
-      HOSTNAME: bkc-testnet-archivenode
+      HOSTNAME: bkc-testnet-validator
       STATS_SERVER: bkc-stats-server:3000
       STATS_PASSWORD: WelcomeToBitkubChain
     ports:
       - "30303:30303/udp"
       - "30303:30303"
       - "8545:8545"
-      - "8546:8546"
     volumes:
       - "./data:/var/lib/bkc/data"
+      - "./password.txt:/etc/bkc/password.txt"
     restart: always
     stop_signal: SIGINT
     stop_grace_period: 60s
