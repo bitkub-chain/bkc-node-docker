@@ -1,5 +1,5 @@
 # Bitkub Chain (PoS) main Network
-Easy run Bitkub Chain Node
+
 
 ### Clone
 ```bash

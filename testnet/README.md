@@ -1,10 +1,10 @@
-# Bitkub Chain (PoS) main Network
-Easy run Bitkub Chain Node
+# Bitkub Chain (PoS) test Network
+
 
 ### Clone
 ```bash
 $ git clone https://github.com/bitkub-chain/bkc-node-docker.git
-$ cd bkc-node-docker/mainnet
+$ cd bkc-node-docker/testnet
 ```
 
 ### Running a Validator

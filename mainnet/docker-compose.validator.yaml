@@ -1,12 +1,17 @@
 version: "3"
 services:
   bkc-node:
-    image: bitkubchainorg/bkc-node-testnet:2.1.0
+    image: bitkubchainorg/bkc-node-mainnet:2.1.0
+    env_file:
+      - ./validator.env      
     command:
-      - "--syncmode=full"
-      - "--gcmode=archive"
+      - "--syncmode=snap"
+      - "--mime"
+      - "--unlock=${ACCOUNT_ADDRESS}"
+      - "--allow-insecure-unlock"
+      - "--password=/etc/bkc/password.txt"
     environment:
-      HOSTNAME: bkc-testnet-archivenode
+      HOSTNAME: bkc-mainnet-validator
       STATS_SERVER: bkc-stats-server:3000
       STATS_PASSWORD: WelcomeToBitkubChain
     ports:
@@ -16,6 +21,7 @@ services:
       - "8546:8546"
     volumes:
       - "./data:/var/lib/bkc/data"
+      - "./data/password.sec:/etc/bkc/password.txt"
     restart: always
     stop_signal: SIGINT
     stop_grace_period: 60s
@@ -25,9 +31,9 @@ services:
       retries: 5
       start_period: 20s
       timeout: 10s
-  
+
   bkc-stats-server:
-    image: bitkubchainorg/bkc-stats-server:testnet
+    image: bitkubchainorg/bkc-stats-server:mainnet
     depends_on:
       - bkc-node
     environment:
