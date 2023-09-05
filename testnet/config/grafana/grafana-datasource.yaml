@@ -1,0 +1,25 @@
+apiVersion: 1
+
+datasources:
+  - name: geth
+    type: influxdb
+    access: proxy
+    user: geth
+    uid: b6664a57-1ad5-4ea3-b741-6d41cec9466a
+    url: http://influxdb:8086
+    jsonData:
+      dbName: geth
+      httpMode: POST
+    secureJsonData:
+      password: geth
+  - name: server
+    type: influxdb
+    access: proxy
+    user: geth
+    uid: e20825be-b2da-426e-beaa-eb12b59bd093
+    url: http://influxdb:8086
+    jsonData:
+      dbName: server
+      httpMode: POST
+    secureJsonData:
+      password: geth
