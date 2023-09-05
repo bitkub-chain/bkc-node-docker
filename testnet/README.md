@@ -9,18 +9,6 @@ $ cd bkc-node-docker/testnet
 
 ### Running a Validator
 ```bash
-# Create data dir
-$ mkdir ./data
-
-# Create password file
-$ echo "<<YourPassword>>" > ./data/password.sec
-
-# Generate account
-$ docker run -v ./data:/var/lib/bkc/data bitkubchainorg/node account new --datadir /var/lib/bkc/data --password /var/lib/bkc/data/password.sec
-
-# Copy the Account Address from the previous step.
-$ echo "ACCOUNT_ADDRESS=<<YourAddress>>" > validator.env
-
 # Run 
 $ docker compose -f docker-compose.validator.yaml up -d
 ```
@@ -37,3 +25,13 @@ $ docker compose -f docker-compose.fullnode.yaml up -d
 # Run 
 $ docker compose -f docker-compose.archivenode.yaml up -d
 ```
+
+### Grafana Dashboard
+- http://localhost:8080
+```
+username: admin
+password: admin
+```
+
+### Stats Dashboard
+- http://localhost:8090

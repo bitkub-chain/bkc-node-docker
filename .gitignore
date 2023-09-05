@@ -1,1 +1,5 @@
-data
+mainnet/data
+mainnet/serect
+mainnet/motd
+testnet/data
+testnet/serect
