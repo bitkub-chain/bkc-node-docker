@@ -1,42 +1,125 @@
 version: "3"
 services:
   bkc-node:
-    image: bitkubchainorg/bkc-node-testnet:2.1.0
-    env_file:
-      - ./validator.env      
+    container_name: bkc-node
+    image: bitkubchainorg/node:2.1.0
+    entrypoint: /usr/bin/docker-entrypoint.sh
+    networks:
+      - node_network
     command:
-      - "--config=/bkc-node/config.toml"
-      - "--datadir=/bkc-node/data"
+      - "--config=/etc/bkc/config.toml"
+      - "--ethstats=bkc-testnet-validator:WelcomeToBitkubChain@bkc-stats:8090"
       - "--syncmode=snap"
-      - "--v5disc"
-    environment:
-      HOSTNAME: bkc-testnet-validator
-      STATS_SERVER: bkc-stats-server:3000
-      STATS_PASSWORD: WelcomeToBitkubChain
+      - "--mine"
+      - "--unlock=0"
+      - "--allow-insecure-unlock"
+      - "--datadir=/var/lib/bkc/data"
+      - "--password=/etc/bkc/serect/password.txt"
+      - --metrics
+      - --metrics.influxdb
+      - --metrics.influxdb.endpoint=http://influxdb:8086
+      - --metrics.influxdb.database=geth
+      - --metrics.influxdb.username=geth
+      - --metrics.influxdb.password=geth
+      - --metrics.influxdb.tags=host=bkc-testnet-validator
     ports:
       - "30303:30303/udp"
       - "30303:30303"
       - "8545:8545"
+      - "8546:8546"
     volumes:
-      - "./data:/var/lib/bkc/data"
-      - "./password.txt:/etc/bkc/password.txt"
+      - "./docker-entrypoint.sh:/usr/bin/docker-entrypoint.sh"
+      - "./data/geth:/var/lib/bkc/data"
+      - "./config:/etc/bkc/"
+      - "./serect/:/etc/bkc/serect/"
+      - "./serect/keystore/:/var/lib/bkc/data/keystore/"
+    depends_on:
+      - bkc-stats
+      - influxdb
     restart: always
     stop_signal: SIGINT
-    stop_grace_period: 60s
+    stop_grace_period: 30s
     healthcheck:
       test: curl --fail http://localhost:8545 || exit 1
       interval: 60s
       retries: 5
       start_period: 20s
-      timeout: 10s
-  
-  bkc-stats-server:
+      timeout: 5s
+
+  bkc-stats:
+    container_name: bkc-stats
     image: bitkubchainorg/bkc-stats-server:testnet
-    depends_on:
-      - bkc-node
+    restart: always
+    networks:
+      - node_network
     environment:
-      PORT: 3000
+      PORT: 8090
       WS_SECRET: WelcomeToBitkubChain
     ports:
-      - "3000:3000"
+      - "8090:8090"
+
+  influxdb:
+    container_name: influxdb
+    image: influxdb:1.8
     restart: always
+    networks:
+      - node_network
+    volumes:
+      - ./data/influxdb:/var/lib/influxdb
+    environment:
+      INFLUXDB_DB: geth; Create database server;
+      INIT_USERS: admin
+      INFLUXDB_ADMIN_USER: geth
+      INFLUXDB_ADMIN_PASSWORD: geth
+      INFLUXDB_META_DIR: /var/lib/influxdb/meta2
+      INFLUXDB_HTTP_AUTH_ENABLED: true
+    ports:
+      - "8086:8086"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8086/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+
+  telegraf:
+    container_name: telegraf
+    image: telegraf
+    restart: always
+    networks:
+      - node_network
+    volumes:
+      - /var/run/docker.sock.raw:/var/run/docker.sock
+      - /proc:/host/proc:ro
+      - ./config/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    depends_on:
+      - influxdb
+    links:
+      - influxdb
+    ports:
+      - "8125:8125"
+
+
+  grafana:
+    container_name: grafana
+    image: grafana/grafana
+    networks:
+      - node_network
+    depends_on:
+      - influxdb
+    links:
+      - influxdb
+    volumes:
+      - ./config/grafana/grafana-dashboard.yaml:/etc/grafana/provisioning/dashboards/main.yaml
+      - ./config/grafana/grafana-datasource.yaml:/etc/grafana/provisioning/datasources/main.yaml
+      - ./config/grafana/dashboards/:/var/lib/grafana/dashboards
+      - ./data/grafana:/var/lib/grafana
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    ports:
+      - "8080:3000"
+    restart: always
+
+networks:
+  node_network:
